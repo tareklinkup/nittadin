@@ -189,7 +189,7 @@
                                     <label class="col-xs-3 control-label no-padding-right"> Sale Rate </label>
                                     <div class="col-xs-9">
                                         <input type="number" id="salesRate" placeholder="Rate" step="0.01"
-                                            class="form-control" v-model="selectedProduct.Product_SellingPrice"
+                                            class="form-control" v-model.number="selectedProduct.Product_SellingPrice"
                                             v-on:input="productTotal" />
                                     </div>
                                 </div>
@@ -197,8 +197,9 @@
                                     <label class="col-xs-3 control-label no-padding-right"> Quantity </label>
                                     <div class="col-xs-9">
                                         <input type="number" step="0.01" id="quantity" placeholder="Qty"
-                                            class="form-control" ref="quantity" v-model="selectedProduct.quantity"
-                                            v-on:input="productTotal" autocomplete="off" required />
+                                            class="form-control" ref="quantity"
+                                            v-model.number="selectedProduct.quantity" v-on:input="productTotal"
+                                            autocomplete="off" value="0" />
                                     </div>
                                 </div>
 
@@ -206,15 +207,15 @@
                                     <label class="col-xs-3 control-label no-padding-right"> Discount</label>
                                     <div class="col-xs-9">
                                         <span>(%)</span>
-                                        <input type="text" id="productDiscount" placeholder="Discount"
+                                        <input type="number" id="productDiscount" placeholder="Discount"
                                             class="form-control" style="display: inline-block; width: 90%" />
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-3 control-label no-padding-right"> Amount </label>
                                     <div class="col-xs-9">
-                                        <input type="text" id="productTotal" placeholder="Amount" class="form-control"
-                                            v-model="selectedProduct.total" readonly />
+                                        <input type="number" id="productTotal" placeholder="Amount" class="form-control"
+                                            v-model.number="selectedProduct.total" readonly />
                                     </div>
                                 </div>
 
@@ -404,8 +405,39 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr style="display:none"
+                                        :style="{ display: sales.selling_type == 'pos' ? '' : 'none'}">
+                                        <td>
+                                            <div class="form-group">
+                                                <label class="col-md-12 control-label no-padding-right"> Customer
+                                                    Cash </label>
+                                                <div class="col-md-12">
+                                                    <input type="number" id="paid" class="form-control"
+                                                        v-model="sales.takeAmount" v-on:input="returnTotal"
+                                                        style="height:40px; font-size:20px; font-weight:bold; background-color:#74b9ff; color:#fff;" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                    <tr>
+                                    <tr style="display:none"
+                                        :style="{ display: sales.selling_type == 'pos' ? '' : 'none'}">
+                                        <td>
+                                            <div class="form-group">
+                                                <label class="col-md-12 control-label no-padding-right"> Customer
+                                                    Return </label>
+                                                <div class="col-md-12">
+                                                    <input type="number" id="paid" class="form-control"
+                                                        v-model="sales.returnAmount" v-on:input="returnTotal"
+                                                        v-bind:disabled="selectedCustomer.Customer_Type == 'G' ? true : false"
+                                                        style="height:40px; font-size:20px; font-weight:bold; background-color:#636e72;color: white;" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr style="display:none"
+                                        :style="{ display: sales.selling_type != 'pos' ? '' : 'none'}">
                                         <td>
                                             <div class="form-group">
                                                 <label class="col-xs-12 control-label no-padding-right">Paid</label>
@@ -418,25 +450,10 @@
                                         </td>
                                     </tr>
 
-                                    <!-- <tr>
-                                        <td>
-                                            <div class="form-group">
-                                                <label class="col-xs-6 control-label">Given Taka</label>
-                                                <div class="col-xs-6">
-                                                    <input type="number" id="given_taka" class="form-control"
-                                                        v-model="sales.due" />
-                                                </div>
 
-                                                <label class="col-xs-6 control-label">Return Amount</label>
-                                                <div class="col-xs-6">
-                                                    <input type="number" id="previousDue" class="form-control"
-                                                        v-model="sales.previousDue" style="color:red;" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr> -->
 
-                                    <tr>
+                                    <tr style="display:none"
+                                        :style="{ display: sales.selling_type != 'pos' ? '' : 'none'}">
                                         <td>
                                             <div class="form-group">
                                                 <label class="col-xs-12 control-label">Due</label>
@@ -643,8 +660,19 @@ new Vue({
             })
         },
         productTotal() {
-            this.selectedProduct.total = (parseFloat(this.selectedProduct.quantity) * parseFloat(this
+            // console.log(this.selectedProduct);
+            this.selectedProduct.total = parseFloat(parseFloat(this.selectedProduct.quantity) * parseFloat(this
                 .selectedProduct.Product_SellingPrice)).toFixed(2);
+
+            $('#productTotal').val(this.selectedProduct.total == 'NaN' ? 0 : this.selectedProduct.total);
+
+        },
+        returnTotal() {
+            this.sales.returnAmount = 0;
+            if (parseFloat(this.sales.takeAmount) >= parseFloat(this.sales.total)) {
+                this.sales.returnAmount = parseFloat(this.sales.takeAmount) - parseFloat(this.sales.total);
+            }
+            this.calculateTotal();
         },
         onSalesTypeChange() {
             this.selectedCustomer = {
@@ -698,6 +726,12 @@ new Vue({
             })
         },
         async productOnChange() {
+
+            if (this.selectedProduct.Product_SlNo == '') {
+                return;
+
+            }
+
             if ((this.selectedProduct.Product_SlNo != '' || this.selectedProduct.Product_SlNo != 0) && this
                 .sales.isService == 'false') {
                 this.productStock = await axios.post('/get_product_stock', {
@@ -709,9 +743,9 @@ new Vue({
                 this.productStockText = this.productStock > 0 ? "Available Stock" : "Stock Unavailable";
             }
 
-            if (this.selectedProduct.Product_SlNo != 0) {
-                this.$refs.quantity.focus();
-            }
+            this.selectedProduct.quantity = 1;
+            this.productTotal();
+            this.$refs.quantity.focus();
         },
         toggleProductPurchaseRate() {
             this.$refs.productPurchaseRate.type = this.$refs.productPurchaseRate.type == 'text' ? 'password' :
@@ -958,7 +992,6 @@ new Vue({
                 this.sales.salesBy = sales.AddBy;
                 this.sales.salesFrom = sales.SaleMaster_branchid;
                 this.sales.salesDate = sales.SaleMaster_SaleDate;
-                this.sales.reminder_date = sales.reminder_date;
                 this.sales.salesType = sales.SaleMaster_SaleType;
                 this.sales.customerId = sales.SalseCustomer_IDNo;
                 this.sales.employeeId = sales.Employee_SlNo;
@@ -968,6 +1001,9 @@ new Vue({
                 this.sales.transportCost = sales.SaleMaster_Freight;
                 this.sales.total = sales.SaleMaster_TotalSaleAmount;
                 this.sales.paid = sales.SaleMaster_PaidAmount;
+                this.sales.takeAmount = sales.customerCashAmount;
+                this.sales.returnAmount = sales.customerReturnAmount;
+                this.sales.selling_type = sales.selling_type;
                 this.sales.previousDue = sales.SaleMaster_Previous_Due;
                 this.sales.due = sales.SaleMaster_DueAmount;
                 this.sales.note = sales.SaleMaster_Description;
@@ -975,7 +1011,8 @@ new Vue({
                 this.oldCustomerId = sales.SalseCustomer_IDNo;
                 this.oldPreviousDue = sales.SaleMaster_Previous_Due;
                 this.sales_due_on_update = sales.SaleMaster_DueAmount;
-
+                // this.selectedAccount = this.accounts.find(item => item.account_id == sales
+                //     .account_id);
                 this.vatPercent = parseFloat(this.sales.vat) * 100 / parseFloat(this.sales
                     .subTotal);
                 this.discountPercent = parseFloat(this.sales.discount) * 100 / parseFloat(this.sales
@@ -1008,6 +1045,7 @@ new Vue({
                         quantity: product.SaleDetails_TotalQuantity,
                         total: product.SaleDetails_TotalAmount,
                         purchaseRate: product.Purchase_Rate,
+                        purchase_id: product.purchase_id,
                     }
 
                     this.cart.push(cartProduct);
@@ -1016,6 +1054,8 @@ new Vue({
                 let gCustomerInd = this.customers.findIndex(c => c.Customer_Type == 'G');
                 this.customers.splice(gCustomerInd, 1);
             })
+
+            console.log(this.sales);
         }
     }
 })

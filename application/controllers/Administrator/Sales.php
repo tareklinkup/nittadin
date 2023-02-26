@@ -32,7 +32,28 @@ class Sales extends CI_Controller
         $data['isService'] = $serviceOrProduct == 'product' ? 'false' : 'true';
         $data['salesId'] = 0;
         $data['invoice'] = $invoice;
+        $data['selling_type'] = '';
         $data['content'] = $this->load->view('Administrator/sales/product_sales', $data, TRUE);
+        $this->load->view('Administrator/index', $data);
+    }
+
+    public function posSales($serviceOrProduct = 'product')
+    {
+        $access = $this->mt->userAccess();
+        if (!$access) {
+            redirect(base_url());
+        }
+        $this->cart->destroy();
+        $this->session->unset_userdata('cheque');
+        $data['title'] = "Product POS Sales";
+
+        $invoice = $this->mt->generateSalesInvoice();
+
+        $data['isService'] = $serviceOrProduct == 'product' ? 'false' : 'true';
+        $data['salesId'] = 0;
+        $data['invoice'] = $invoice;
+        $data['selling_type'] = 'pos';
+        $data['content'] = $this->load->view('Administrator/sales/product_pos_sales', $data, TRUE);
         $this->load->view('Administrator/index', $data);
     }
 
@@ -127,6 +148,9 @@ class Sales extends CI_Controller
                 'SaleMaster_Freight' => $data->sales->transportCost,
                 'SaleMaster_SubTotalAmount' => $data->sales->subTotal,
                 'SaleMaster_PaidAmount' => $data->sales->paid,
+                'selling_type' => $data->sales->selling_type,
+                'customerCashAmount' => $data->sales->takeAmount,
+                'customerReturnAmount' => $data->sales->returnAmount,
                 'SaleMaster_DueAmount' => $data->sales->due,
                 'SaleMaster_Previous_Due' => $data->sales->previousDue,
                 'SaleMaster_Description' => $data->sales->note,
@@ -195,8 +219,9 @@ class Sales extends CI_Controller
         $sales = $this->db->query("select * from tbl_salesmaster where SaleMaster_SlNo = ?", $salesId)->row();
         $data['isService'] = $productOrService == 'product' ? 'false' : 'true';
         $data['salesId'] = $salesId;
+        $data['selling_type'] = $sales->selling_type;
         $data['invoice'] = $sales->SaleMaster_InvoiceNo;
-        $data['content'] = $this->load->view('Administrator/sales/product_sales', $data, TRUE);
+        $data['content'] = $this->load->view('Administrator/sales/product_pos_sales', $data, TRUE);
         $this->load->view('Administrator/index', $data);
     }
 
@@ -396,23 +421,26 @@ class Sales extends CI_Controller
             }
 
             $sales = array(
-                'SalseCustomer_IDNo' => $data->sales->customerId,
-                'employee_id' => $data->sales->employeeId,
-                'SaleMaster_SaleDate' => $data->sales->salesDate,
-                'reminder_date' => isset($data->sales->reminder_date) ? $data->sales->reminder_date : null,
-                'SaleMaster_SaleType' => $data->sales->salesType,
-                'SaleMaster_TotalSaleAmount' => $data->sales->total,
+                'SalseCustomer_IDNo'             => $data->sales->customerId,
+                'employee_id'                    => $data->sales->employeeId,
+                'SaleMaster_SaleDate'            => $data->sales->salesDate,
+                'reminder_date'                  => isset($data->sales->reminder_date) ? $data->sales->reminder_date : null,
+                'SaleMaster_SaleType'            => $data->sales->salesType,
+                'SaleMaster_TotalSaleAmount'     => $data->sales->total,
                 'SaleMaster_TotalDiscountAmount' => $data->sales->discount,
-                'SaleMaster_TaxAmount' => $data->sales->vat,
-                'SaleMaster_Freight' => $data->sales->transportCost,
-                'SaleMaster_SubTotalAmount' => $data->sales->subTotal,
-                'SaleMaster_PaidAmount' => $data->sales->paid,
-                'SaleMaster_DueAmount' => $data->sales->due,
-                'SaleMaster_Previous_Due' => $data->sales->previousDue,
-                'SaleMaster_Description' => $data->sales->note,
-                "UpdateBy" => $this->session->userdata("FullName"),
-                'UpdateTime' => date("Y-m-d H:i:s"),
-                "SaleMaster_branchid" => $this->session->userdata("BRANCHid")
+                'SaleMaster_TaxAmount'           => $data->sales->vat,
+                'SaleMaster_Freight'             => $data->sales->transportCost,
+                'SaleMaster_SubTotalAmount'      => $data->sales->subTotal,
+                'SaleMaster_PaidAmount'          => $data->sales->paid,
+                'selling_type'                   => $data->sales->selling_type,
+                'customerCashAmount'             => $data->sales->takeAmount,
+                'customerReturnAmount'           => $data->sales->returnAmount,
+                'SaleMaster_DueAmount'           => $data->sales->due,
+                'SaleMaster_Previous_Due'        => $data->sales->previousDue,
+                'SaleMaster_Description'         => $data->sales->note,
+                "UpdateBy"                       => $this->session->userdata("FullName"),
+                'UpdateTime'                     => date("Y-m-d H:i:s"),
+                "SaleMaster_branchid"            => $this->session->userdata("BRANCHid")
             );
 
             $this->db->where('SaleMaster_SlNo', $salesId);
@@ -1273,7 +1301,8 @@ class Sales extends CI_Controller
                     $row = $sql->result();
                     foreach ($row as $row) { ?>
 
-                        <option value="<?php echo $row->Customer_SlNo; ?>"><?php echo $row->Customer_Name; ?> (<?php echo $row->Customer_Code; ?>)</option>
+                        <option value="<?php echo $row->Customer_SlNo; ?>"><?php echo $row->Customer_Name; ?>
+                            (<?php echo $row->Customer_Code; ?>)</option>
                     <?php } ?>
                 </select>
             </div>
@@ -1292,7 +1321,8 @@ class Sales extends CI_Controller
                     $row = $sql->result();
                     foreach ($row as $row) { ?>
 
-                        <option value="<?php echo $row->Customer_SlNo; ?>"><?php echo $row->Customer_Name; ?> (<?php echo $row->Customer_Code; ?>)</option>
+                        <option value="<?php echo $row->Customer_SlNo; ?>"><?php echo $row->Customer_Name; ?>
+                            (<?php echo $row->Customer_Code; ?>)</option>
                     <?php } ?>
                 </select>
             </div>

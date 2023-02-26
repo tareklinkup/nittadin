@@ -55,12 +55,17 @@ const salesInvoice = Vue.component('sales-invoice', {
                                     <td>{{ product.SaleDetails_Rate }}</td>
                                     <td align="right">{{ product.SaleDetails_TotalAmount }}</td>
                                 </tr>
-                                <tr>
-                                <td colspan="2"></td>
-                                <td>{{Total_qty}}</td>
-                                <td colspan="3"></td>
-                                </tr>
+         
                             </tbody>
+                            <tfoot> 
+                                <tr style="font-weight:bold;"> 
+                                    <td colspan="2" style="text-align:right;"> Total Qty </td>
+                                    <td> {{ cart.reduce( (prev,curr) => { return prev + + curr.SaleDetails_TotalQuantity},0) }} </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

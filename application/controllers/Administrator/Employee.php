@@ -378,6 +378,73 @@ class Employee extends CI_Controller
         }
     }
 
+
+
+
+    //year functionality
+
+    public function year()
+    {
+        $access = $this->mt->userAccess();
+        if(!$access){
+            redirect(base_url());
+        }
+        $data['title'] = 'Year';
+        $data['content'] = $this->load->view('Administrator/employee/year', $data, TRUE);
+        $this->load->view('Administrator/index', $data);
+    }
+
+    public function insert_year()
+    {
+        $year_name = $this->input->post('year');
+        $query = $this->db->query("SELECT year_name from tbl_year where year_name = '$year_name'");
+
+        if ($query->num_rows() > 0) {
+            $exists = "This Name is Already Exists";
+            echo json_encode($exists);
+        } else {
+            $data = array(
+                "year_name" => $this->input->post('year', TRUE),
+                /*   "AddBy"                  =>$this->session->userdata("FullName"),
+                  "AddTime"                =>date("Y-m-d H:i:s") */
+            );
+            if ($this->mt->save_data('tbl_year', $data)) {
+                $message = "Year insert success";
+                echo json_encode($message);
+            }
+        }
+    }
+
+    public function editYear($id)
+    {
+        $query = $this->db->query("SELECT * from tbl_year where year_id = '$id'");
+        $data['row'] = $query->row();
+        $this->load->view('Administrator/employee/edit_year', $data);
+    }
+
+    public function updateYear()
+    {
+        $id = $this->input->post('year_id');
+        $fld = 'year_id';
+        $data = array(
+            "year_name" => $this->input->post('year', TRUE),
+        );
+        if ($this->mt->update_data("tbl_year", $data, $id, $fld)) {
+            //$message = "Update insert success";
+            //echo json_encode($message);
+            redirect('year');
+        }
+    }
+
+    public function getYears(){
+        $years = $this->db->query(
+            "SELECT * from tbl_year
+            order by year_id desc
+        ")->result();
+
+        echo json_encode($years);
+    }
+
     public function fancybox_designation()
     {
         $this->load->view('Administrator/employee/em_designation');

@@ -7,6 +7,7 @@
         border-radius: 3px;
         text-align: center;
     }
+
     .widgets .widget-icon {
         width: 40px;
         height: 40px;
@@ -14,25 +15,28 @@
         border-radius: 50%;
         color: white;
     }
+
     .widgets .widget-content {
         flex-grow: 2;
         font-weight: bold;
     }
+
     .widgets .widget-content .widget-text {
         font-size: 13px;
         color: #6f6f6f;
     }
+
     .widgets .widget-content .widget-value {
         font-size: 16px;
     }
 
     .custom-table-bordered,
-    .custom-table-bordered>tbody>tr>td, 
-    .custom-table-bordered>tbody>tr>th, 
-    .custom-table-bordered>tfoot>tr>td, 
-    .custom-table-bordered>tfoot>tr>th, 
-    .custom-table-bordered>thead>tr>td, 
-    .custom-table-bordered>thead>tr>th{
+    .custom-table-bordered>tbody>tr>td,
+    .custom-table-bordered>tbody>tr>th,
+    .custom-table-bordered>tfoot>tr>td,
+    .custom-table-bordered>tfoot>tr>th,
+    .custom-table-bordered>thead>tr>td,
+    .custom-table-bordered>thead>tr>th {
         border: 1px solid #224079;
     }
 </style>
@@ -48,10 +52,12 @@
                 <div class="widget-icon" style="background-color: #1c8dff;text-align:center;">
                     <i class="fa fa-shopping-cart fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Today's Sale</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ todaysSale | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ todaysSale | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,10 +66,12 @@
                 <div class="widget-icon" style="background-color: #666633;text-align:center;">
                     <i class="fa fa-money fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Collection</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ todaysCollection | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ todaysCollection | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,10 +80,12 @@
                 <div class="widget-icon" style="background-color: #008241;text-align:center;">
                     <i class="fa fa-shopping-cart fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Monthly Sale</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ thisMonthSale | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ thisMonthSale | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,10 +94,12 @@
                 <div class="widget-icon" style="background-color: #ff8000;text-align:center;">
                     <i class="fa fa-reply fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Customer Due</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ customerDue | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ customerDue | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,10 +108,12 @@
                 <div class="widget-icon" style="background-color: #ae0000;text-align:center;">
                     <i class="fa fa-dollar fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Cash Balance</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ cashBalance | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ cashBalance | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,10 +122,12 @@
                 <div class="widget-icon" style="background-color: #663300;text-align:center;">
                     <i class="fa fa-dollar fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Bank Balance</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ bankBalance | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ bankBalance | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -122,10 +138,12 @@
                 <div class="widget-icon" style="background-color: #1c8dff;text-align:center;">
                     <i class="fa fa-home fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Stock Value</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ stockValue | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ stockValue | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -134,10 +152,12 @@
                 <div class="widget-icon" style="background-color: #666633;text-align:center;">
                     <i class="fa fa-building fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Asset Value</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ assetValue | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ assetValue | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,10 +166,12 @@
                 <div class="widget-icon" style="background-color: #008241;text-align:center;">
                     <i class="fa fa-reply fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Supplier Due</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ supplierDue | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ supplierDue | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -158,10 +180,12 @@
                 <div class="widget-icon" style="background-color: #ff8000;text-align:center;">
                     <i class="fa fa-dollar fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Invest Balance</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ investBalance | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ investBalance | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -170,10 +194,12 @@
                 <div class="widget-icon" style="background-color: #ae0000;text-align:center;">
                     <i class="fa fa-dollar fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Loan Balance</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ loanBalance | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ loanBalance | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,59 +208,76 @@
                 <div class="widget-icon" style="background-color: #663300;text-align:center;">
                     <i class="fa fa-line-chart fa-2x"></i>
                 </div>
-                
+
                 <div class="widget-content">
                     <div class="widget-text">Monthly Profit</div>
-                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name');?> {{ thisMonthProfit | decimal }}</div>
+                    <div class="widget-value"><?php echo $this->session->userdata('Currency_Name'); ?>
+                        {{ thisMonthProfit | decimal }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row" style="margin-top:20px;margin-bottom: 25px;">
-        
+        <!-- <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-1 control-label" style="width:60px;"> Year: </label>
+                <div class="col-sm-2">
+                    <select class="form-control" v-model="year" style="padding: 1px;border-radius:4px">
+                        <option value="">Select</option>
+                        <?php
+                        for ($i = date("Y") - 5; $i
+                            <= date("Y") + 5; $i++) { ?>
+                            <option value="<?= $i ?>"><?= $i ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-1">
+                    <input type="submit" value="Go" v-on:click.prevent="getChartData()">
+                </div>
+            </div>
+        </div> -->
         <div class="col-md-12" v-if="salesGraph == 'monthly'">
             <h3 class="text-center">This Month's Sale</h3>
-            <sales-chart
-            type="ColumnChart"
-            :data="salesData"
-            :options="salesChartOptions"
-            />
+            <sales-chart type="ColumnChart" :data="salesData" :options="salesChartOptions" />
         </div>
-        <div class="col-md-12" v-else>
+        <div class="col-md-12" v-if="salesGraph == 'yearly'">
             <h3 class="text-center">This Year's Sale</h3>
-            <sales-chart
-            type="ColumnChart"
-            :data="yearlySalesData"
-            :options="yearlySalesChartOptions"
-            />
+            <sales-chart type="ColumnChart" :data="yearlySalesData" :options="yearlySalesChartOptions" />
+        </div>
+        <div class="col-md-12" v-if="salesGraph == 'ten_years'">
+            <h3 class="text-center">Last Ten Years Sale</h3>
+            <sales-chart type="ColumnChart" :data="tenYears" :options="fiveYearlySalesChartOptions" />
         </div>
         <div class="col-md-12 text-center">
             <div class="btn-group" role="group" aria-label="...">
                 <button type="button" class="btn btn-primary" @click="salesGraph = 'monthly'">Monthly</button>
                 <button type="button" class="btn btn-warning" @click="salesGraph = 'yearly'">Yearly</button>
+                <button type="button" class="btn btn-info" @click.prevent="getChartData()" @click="salesGraph = 'ten_years'">Last 10 Years</button>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
             <h3 class="text-center">Top Sold Products</h3>
-            <top-product-chart
-            type="PieChart"
-            :data="topProducts"
-            :options="topProductsOptions"
-            />
+            <top-product-chart type="PieChart" :data="topProducts" :options="topProductsOptions" />
         </div>
-        <div class="col-md-4 col-md-offset-2">
+        <div class="col-md-4 col-md-offset-2" style="height: 330px;overflow: scroll;">
             <table class="table custom-table-bordered">
                 <thead>
                     <tr>
-                        <td class="text-center" colspan="2" style="background-color: #224079;color: white;font-weight: 900;">Top Customers</td>
+                        <th class="text-center" style="background-color: #224079;color: white;">SL</th>
+                        <th class="text-center" style="background-color: #224079;color: white;">Top Customers</th>
+                        <th class="text-center" style="background-color: #224079;color: white;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="customer in topCustomers">
-                        <td width="75%">{{customer.customer_name}}</td>
-                        <td width="25%">{{customer.amount}}</td>
+                    <tr v-for="(customer,i) in topCustomers">
+                        <td width="10%">{{i + 1}}</td>
+                        <td width="70%">{{customer.customer_name}}</td>
+                        <td width="20%">{{customer.amount}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -250,10 +293,10 @@
     </div>
 </div>
 
-<script src="<?php echo base_url();?>assets/js/vue/vue.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/axios.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/moment.min.js"></script>
-<script src="<?php echo base_url();?>assets/js/vue/components/vue-google-charts.browser.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/vue.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/axios.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/vue/components/vue-google-charts.browser.js"></script>
 
 <script>
     let googleChart = VueGoogleCharts.GChart;
@@ -269,8 +312,9 @@
                 return value == null || value == '' ? '0.00' : parseFloat(value).toFixed(2);
             }
         },
-        data () {
+        data() {
             return {
+                year: '<?= date('Y') ?>',
                 salesData: [
                     ['Date', 'Sales']
                 ],
@@ -283,10 +327,19 @@
                 yearlySalesData: [
                     ['Month', 'Sales']
                 ],
+                tenYears: [
+                    ['Year', 'Sales']
+                ],
                 yearlySalesChartOptions: {
                     chart: {
                         title: 'Sales',
                         subtitle: "This year's sales data",
+                    }
+                },
+                fiveYearlySalesChartOptions: {
+                    chart: {
+                        title: 'Sales',
+                        subtitle: "Last Ten year's sales data",
                     }
                 },
                 topProducts: [
@@ -307,7 +360,7 @@
                 //         subtitle: "Top sold products"
                 //     }
                 // },
-                topCustomers : [],
+                topCustomers: [],
                 salesText: '',
                 todaysSale: 0,
                 thisMonthSale: 0,
@@ -325,14 +378,14 @@
                 salesGraph: 'monthly'
             }
         },
-        created(){
+        created() {
             this.getGraphData();
             setInterval(() => {
                 this.getGraphData();
-            }, 10000);
+            }, 60000);
         },
         methods: {
-            getGraphData(){
+            getGraphData() {
                 axios.get('/get_graph_data').then(res => {
                     this.salesData = [
                         ['Date', 'Sales']
@@ -352,20 +405,20 @@
                         return sale.sale_text;
                     }).join(' | ');
 
-                    this.todaysSale         = res.data.todays_sale;
-                    this.thisMonthSale      = res.data.this_month_sale;
-                    this.todaysCollection   = res.data.todays_collection;
-                    this.cashBalance        = res.data.cash_balance;
-                    this.customerDue        = res.data.customer_due;
-                    this.bankBalance        = res.data.bank_balance;
-                    this.thisMonthProfit    = res.data.this_month_profit;
-                    this.stockValue         = res.data.stock_value;
-                    this.assetValue         = res.data.asset_value;
-                    this.supplierDue        = res.data.supplier_due;
-                    this.investBalance      = res.data.invest_balance;
-                    this.loanBalance        = res.data.loan_balance;
+                    this.todaysSale = res.data.todays_sale;
+                    this.thisMonthSale = res.data.this_month_sale;
+                    this.todaysCollection = res.data.todays_collection;
+                    this.cashBalance = res.data.cash_balance;
+                    this.customerDue = res.data.customer_due;
+                    this.bankBalance = res.data.bank_balance;
+                    this.thisMonthProfit = res.data.this_month_profit;
+                    this.stockValue = res.data.stock_value;
+                    this.assetValue = res.data.asset_value;
+                    this.supplierDue = res.data.supplier_due;
+                    this.investBalance = res.data.invest_balance;
+                    this.loanBalance = res.data.loan_balance;
 
-                    this.topCustomers       = res.data.top_customers;
+                    this.topCustomers = res.data.top_customers;
 
                     // this.topCustomers = [
                     //     ['Customer', 'Amount']
@@ -382,6 +435,18 @@
                     })
 
                     this.showData = true;
+                })
+            },
+            async getChartData() {
+
+                await axios.get('/get_yearly_data').then(res => {
+
+                    this.tenYears = [
+                        ['Year', 'Sales']
+                    ]
+                    res.data.yearly_record.forEach(d => {
+                        this.tenYears.push(d);
+                    })
                 })
             }
         }

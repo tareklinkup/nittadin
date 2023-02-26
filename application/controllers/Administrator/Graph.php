@@ -1,34 +1,42 @@
 <?php
-    class Graph extends CI_Controller{
-        public function __construct(){
-            parent::__construct();
-            $access = $this->session->userdata('userId');
-            $this->branchId = $this->session->userdata('BRANCHid');
-            if($access == '' ){
-                redirect("Login");
-            }
-            $this->load->model('Model_table', "mt", TRUE);
+class Graph extends CI_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $access = $this->session->userdata('userId');
+        $this->branchId = $this->session->userdata('BRANCHid');
+        if ($access == '') {
+            redirect("Login");
         }
-        
-        public function graph(){
-            $access = $this->mt->userAccess();
-            if(!$access){
-                redirect(base_url());
-            }
-            $data['title'] = "Graph";
-            $data['content'] = $this->load->view('Administrator/graph/graph', $data, true);
-            $this->load->view('Administrator/index', $data);
-        }
+        $this->load->model('Model_table', "mt", TRUE);
+    }
 
-        public function getGraphData(){
-            // Monthly Record
-            $monthlyRecord = [];
-            $year = date('Y');
-            $month = date('m');
-            $dayNumber = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-            for($i = 1; $i <= $dayNumber; $i++){
-                $date = $year . '-' . $month . '-'. sprintf("%02d", $i);
-                $query = $this->db->query("
+    public function graph()
+    {
+        $access = $this->mt->userAccess();
+        if (!$access) {
+            redirect(base_url());
+        }
+        $data['title'] = "Graph";
+        $data['content'] = $this->load->view('Administrator/graph/graph', $data, true);
+        $this->load->view('Administrator/index', $data);
+    }
+
+    public function getGraphData()
+    {
+        // Monthly Record
+
+        $years = json_decode($this->input->raw_input_stream);
+        $monthlyRecord = [];
+        //$year = json_encode($years);
+        $year = date('Y');
+
+        $month = date('m');
+        $dayNumber = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        for ($i = 1; $i <= $dayNumber; $i++) {
+            $date = $year . '-' . $month . '-' . sprintf("%02d", $i);
+            $query = $this->db->query("
                     select ifnull(sum(sm.SaleMaster_TotalSaleAmount), 0) as sales_amount 
                     from tbl_salesmaster sm 
                     where sm.SaleMaster_SaleDate = ?
@@ -36,22 +44,21 @@
                     and sm.SaleMaster_branchid = ?
                     group by sm.SaleMaster_SaleDate
                 ", [$date, $this->branchId]);
-
+            $amount = 0.00;
+            if ($query->num_rows() == 0) {
                 $amount = 0.00;
-
-                if($query->num_rows() == 0){
-                    $amount = 0.00;
-                } else {
-                    $amount = $query->row()->sales_amount;
-                }
-                $sale = [sprintf("%02d", $i), $amount];
-                array_push($monthlyRecord, $sale);
+            } else {
+                $amount = $query->row()->sales_amount;
             }
+            $sale = [sprintf("%02d", $i), $amount];
+            array_push($monthlyRecord, $sale);
+        }
 
-            $yearlyRecord = [];
-            for($i = 1; $i <= 12; $i++) {
-                $yearMonth = $year . sprintf("%02d", $i);
-                $query = $this->db->query("
+        $yearlyRecord = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $yearMonth = $year . sprintf("%02d", $i);
+            $query = $this->db->query("
                     select ifnull(sum(sm.SaleMaster_TotalSaleAmount), 0) as sales_amount 
                     from tbl_salesmaster sm 
                     where extract(year_month from sm.SaleMaster_SaleDate) = ?
@@ -60,20 +67,20 @@
                     group by extract(year_month from sm.SaleMaster_SaleDate)
                 ", [$yearMonth, $this->branchId]);
 
+            $amount = 0.00;
+            $monthName = date("M", mktime(0, 0, 0, $i, 10));
+
+            if ($query->num_rows() == 0) {
                 $amount = 0.00;
-                $monthName = date("M", mktime(0, 0, 0, $i, 10));
-
-                if($query->num_rows() == 0){
-                    $amount = 0.00;
-                } else {
-                    $amount = $query->row()->sales_amount;
-                }
-                $sale = [$monthName, $amount];
-                array_push($yearlyRecord, $sale);
+            } else {
+                $amount = $query->row()->sales_amount;
             }
+            $sale = [$monthName, $amount];
+            array_push($yearlyRecord, $sale);
+        }
 
-            // Sales text for marquee
-            $sales_text = $this->db->query("
+        // Sales text for marquee
+        $sales_text = $this->db->query("
                 select 
                     concat(
                         'Invoice: ', sm.SaleMaster_InvoiceNo,
@@ -89,8 +96,8 @@
                 order by sm.SaleMaster_SlNo desc limit 20
             ", $this->branchId)->result();
 
-            // Today's Sale
-            $todaysSale = $this->db->query("
+        // Today's Sale
+        $todaysSale = $this->db->query("
                 select 
                     ifnull(sum(ifnull(sm.SaleMaster_TotalSaleAmount, 0)), 0) as total_amount
                 from tbl_salesmaster sm
@@ -99,8 +106,8 @@
                 and sm.SaleMaster_branchid = ?
             ", [date('Y-m-d'), $this->branchId])->row()->total_amount;
 
-            // This Month's Sale
-            $thisMonthSale = $this->db->query("
+        // This Month's Sale
+        $thisMonthSale = $this->db->query("
                 select 
                     ifnull(sum(ifnull(sm.SaleMaster_TotalSaleAmount, 0)), 0) as total_amount
                 from tbl_salesmaster sm
@@ -110,8 +117,8 @@
                 and sm.SaleMaster_branchid = ?
             ", [$month, $year, $this->branchId])->row()->total_amount;
 
-            // Today's Cash Collection
-            $todaysCollection = $this->db->query("
+        // Today's Cash Collection
+        $todaysCollection = $this->db->query("
                 select 
                 ifnull((
                     select sum(ifnull(sm.SaleMaster_PaidAmount, 0)) 
@@ -137,11 +144,11 @@
                 ), 0) as total_amount
             ")->row()->total_amount;
 
-            // Cash Balance
-            $cashBalance = $this->mt->getTransactionSummary()->cash_balance;
+        // Cash Balance
+        $cashBalance = $this->mt->getTransactionSummary()->cash_balance;
 
-            // Top Customers
-            $topCustomers = $this->db->query("
+        // Top Customers
+        $topCustomers = $this->db->query("
                 select 
                 c.Customer_Name as customer_name,
                 ifnull(sum(sm.SaleMaster_TotalSaleAmount), 0) as amount
@@ -150,11 +157,11 @@
                 where sm.SaleMaster_branchid = ?
                 group by sm.SalseCustomer_IDNo
                 order by amount desc 
-                limit 10
+                limit 20
             ", $this->branchId)->result();
 
-            // Top Products
-            $topProducts = $this->db->query("
+        // Top Products
+        $topProducts = $this->db->query("
                 select 
                     p.Product_Name as product_name,
                     ifnull(sum(sd.SaleDetails_TotalQuantity), 0) as sold_quantity
@@ -165,50 +172,52 @@
                 limit 5
             ")->result();
 
-            // Customer Due
-            $customerDueResult = $this->mt->customerDue();
-            $customerDue = array_sum(array_map(function($due) {
-                return $due->dueAmount;
-            }, $customerDueResult));
+        // Customer Due
+        $customerDueResult = $this->mt->customerDue();
+        $customerDue = array_sum(array_map(function ($due) {
+            return $due->dueAmount;
+        }, $customerDueResult));
 
-            // Supplier Due
-            $supplierDueResult = $this->mt->supplierDue();
-            $supplierDue = array_sum(array_map(function($due) {
-                return $due->due;
-            }, $supplierDueResult));
+        // Supplier Due
+        $supplierDueResult = $this->mt->supplierDue();
+        $supplierDue = array_sum(array_map(function ($due) {
+            return $due->due;
+        }, $supplierDueResult));
 
-            // Bank balance
-            $bankTransactions = $this->mt->getBankTransactionSummary();
-            $bankBalance = array_sum(array_map(function($bank){
-                return $bank->balance;
-            }, $bankTransactions));
+        // Bank balance
+        $bankTransactions = $this->mt->getBankTransactionSummary();
+        $bankBalance = array_sum(array_map(function ($bank) {
+            return $bank->balance;
+        }, $bankTransactions));
 
-            // Invest balance
-            $investTransactions = $this->mt->getInvestmentTransactionSummary();
-            $investBalance = array_sum(array_map(function($bank){
-                return $bank->balance;
-            }, $investTransactions));
+        // Invest balance
+        $investTransactions = $this->mt->getInvestmentTransactionSummary();
+        $investBalance = array_sum(array_map(function ($bank) {
+            return $bank->balance;
+        }, $investTransactions));
 
-            // Loan balance
-            $loanTransactions = $this->mt->getLoanTransactionSummary();
-            $loanBalance = array_sum(array_map(function($bank){
-                return $bank->balance;
-            }, $loanTransactions));
+        // Loan balance
+        $loanTransactions = $this->mt->getLoanTransactionSummary();
+        $loanBalance = array_sum(array_map(function ($bank) {
+            return $bank->balance;
+        }, $loanTransactions));
 
-            //Assets Value
-            $assets = $this->mt->assetsReport();
-            $assets_value = array_reduce($assets, function($prev, $curr){ return $prev + $curr->approx_amount;});
+        //Assets Value
+        $assets = $this->mt->assetsReport();
+        $assets_value = array_reduce($assets, function ($prev, $curr) {
+            return $prev + $curr->approx_amount;
+        });
 
-            //stock value
-            $stocks = $this->mt->currentStock();
-            $stockValue = array_sum(
-                array_map(function($product){
-                    return $product->stock_value;
-                }, $stocks)
-            );
+        //stock value
+        $stocks = $this->mt->currentStock();
+        $stockValue = array_sum(
+            array_map(function ($product) {
+                return $product->stock_value;
+            }, $stocks)
+        );
 
-            //this month profit loss
-            $sales = $this->db->query("
+        //this month profit loss
+        $sales = $this->db->query("
                 select 
                     sm.*
                 from tbl_salesmaster sm
@@ -218,8 +227,8 @@
                 and year(sm.SaleMaster_SaleDate) = ?
             ", [$this->branchId, $month, $year])->result();
 
-            foreach($sales as $sale){
-                $sale->saleDetails = $this->db->query("
+        foreach ($sales as $sale) {
+            $sale->saleDetails = $this->db->query("
                     select
                         sd.*,
                         (sd.Purchase_Rate * sd.SaleDetails_TotalQuantity) as purchased_amount,
@@ -227,28 +236,28 @@
                     from tbl_saledetails sd
                     where sd.SaleMaster_IDNo = ?
                 ", $sale->SaleMaster_SlNo)->result();
-            }
+        }
 
-            $profits = array_reduce($sales, function($prev, $curr){ 
-                return $prev + array_reduce($curr->saleDetails, function($p, $c){
-                    return $p + $c->profit_loss;
-                });
+        $profits = array_reduce($sales, function ($prev, $curr) {
+            return $prev + array_reduce($curr->saleDetails, function ($p, $c) {
+                return $p + $c->profit_loss;
             });
+        });
 
-            $total_transport_cost = array_reduce($sales, function($prev, $curr){ 
-                return $prev + $curr->SaleMaster_Freight;
-            });
-            
-            $total_discount = array_reduce($sales, function($prev, $curr){ 
-                return $prev + $curr->SaleMaster_TotalDiscountAmount;
-            });
+        $total_transport_cost = array_reduce($sales, function ($prev, $curr) {
+            return $prev + $curr->SaleMaster_Freight;
+        });
 
-            $total_vat = array_reduce($sales, function($prev, $curr){ 
-                return $prev + $curr->SaleMaster_TaxAmount;
-            });
+        $total_discount = array_reduce($sales, function ($prev, $curr) {
+            return $prev + $curr->SaleMaster_TotalDiscountAmount;
+        });
+
+        $total_vat = array_reduce($sales, function ($prev, $curr) {
+            return $prev + $curr->SaleMaster_TaxAmount;
+        });
 
 
-            $other_income_expense = $this->db->query("
+        $other_income_expense = $this->db->query("
                 select
                 (
                     select ifnull(sum(ct.In_Amount), 0)
@@ -330,42 +339,77 @@
                 ) as returned_amount
             ")->row();
 
-            $net_profit = (
-                $profits + $total_transport_cost + 
-                $other_income_expense->income + $total_vat
-            ) - (
-                $total_discount + 
-                $other_income_expense->returned_amount + 
-                $other_income_expense->damaged_amount + 
-                $other_income_expense->expense + 
-                $other_income_expense->employee_payment + 
-                $other_income_expense->profit_distribute + 
-                $other_income_expense->loan_interest + 
-                $other_income_expense->assets_sales_profit_loss 
-            );
+        $net_profit = ($profits + $total_transport_cost +
+            $other_income_expense->income + $total_vat
+        ) - ($total_discount +
+            $other_income_expense->returned_amount +
+            $other_income_expense->damaged_amount +
+            $other_income_expense->expense +
+            $other_income_expense->employee_payment +
+            $other_income_expense->profit_distribute +
+            $other_income_expense->loan_interest +
+            $other_income_expense->assets_sales_profit_loss
+        );
 
 
-            $responseData = [
-                'monthly_record'    => $monthlyRecord,
-                'yearly_record'     => $yearlyRecord,
-                'sales_text'        => $sales_text,
-                'todays_sale'       => $todaysSale,
-                'this_month_sale'   => $thisMonthSale,
-                'todays_collection' => $todaysCollection,
-                'cash_balance'      => $cashBalance,
-                'top_customers'     => $topCustomers,
-                'top_products'      => $topProducts,
-                'customer_due'      => $customerDue,
-                'supplier_due'      => $supplierDue,
-                'bank_balance'      => $bankBalance,
-                'invest_balance'    => $investBalance,
-                'loan_balance'      => $loanBalance,
-                'asset_value'       => $assets_value,
-                'stock_value'       => $stockValue,
-                'this_month_profit' => $net_profit,
-            ];
+        $responseData = [
+            'monthly_record'    => $monthlyRecord,
+            'yearly_record'     => $yearlyRecord,
+            'sales_text'        => $sales_text,
+            'todays_sale'       => $todaysSale,
+            'this_month_sale'   => $thisMonthSale,
+            'todays_collection' => $todaysCollection,
+            'cash_balance'      => $cashBalance,
+            'top_customers'     => $topCustomers,
+            'top_products'      => $topProducts,
+            'customer_due'      => $customerDue,
+            'supplier_due'      => $supplierDue,
+            'bank_balance'      => $bankBalance,
+            'invest_balance'    => $investBalance,
+            'loan_balance'      => $loanBalance,
+            'asset_value'       => $assets_value,
+            'stock_value'       => $stockValue,
+            'this_month_profit' => $net_profit,
+        ];
 
-            echo json_encode($responseData, JSON_NUMERIC_CHECK);
-        }
+        echo json_encode($responseData, JSON_NUMERIC_CHECK);
     }
-?>
+
+    public function getYearlyData()
+    {
+
+        // $data = json_decode($this->input->raw_input_stream);
+
+        $yearlyRecord = [];
+        // $year = date('Y');
+
+        for ($i = 9; $i >= 0; $i--) {
+            $year = date('Y') - $i;
+            $query = $this->db->query("
+                    select ifnull(sum(sm.SaleMaster_TotalSaleAmount), 0) as sales_amount 
+                    from tbl_salesmaster sm 
+                    where extract(year from sm.SaleMaster_SaleDate) = ?
+                    and sm.Status = 'a'
+                    and sm.SaleMaster_branchid = ?
+                    group by extract(year from sm.SaleMaster_SaleDate)
+                ", [$year, $this->branchId]);
+
+            // $amount = 0.00;
+            // $monthName = date("M", mktime(0, 0, 0, $i, 10));
+
+            if ($query->num_rows() == 0) {
+                $amount = 0.00;
+            } else {
+                $amount = $query->row()->sales_amount;
+            }
+            $sale = [$year, $amount];
+            array_push($yearlyRecord, $sale);
+        }
+
+        $responseData = [
+            'yearly_record'     => $yearlyRecord,
+        ];
+
+        echo json_encode($responseData, JSON_NUMERIC_CHECK);
+    }
+}
